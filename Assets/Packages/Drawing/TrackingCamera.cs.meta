@@ -1,10 +1,12 @@
 fileFormatVersion: 2
 guid: 4e7172b8f1bc04c47943a6a3af0104f8
-timeCreated: 1433148822
+timeCreated: 1465388063
 licenseType: Pro
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - trackingMat: {fileID: 2100000, guid: 7455835c3cbd90b4189e7ef82ba14c52, type: 2}
+  - targetCam: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

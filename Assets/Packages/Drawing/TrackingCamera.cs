@@ -71,20 +71,23 @@ namespace DrawingSystem {
             _attachedCam.transform.localPosition = targetCam.transform.localPosition;
             _attachedCam.transform.localRotation = targetCam.transform.localRotation;
 
+            _attachedCam.clearFlags = CameraClearFlags.Nothing;
+            _attachedCam.cullingMask = 0;
             _attachedCam.depth = targetCam.depth - 1;
             _attachedCam.orthographic = targetCam.orthographic;
             _attachedCam.orthographicSize = targetCam.orthographicSize;
             _attachedCam.fieldOfView = targetCam.fieldOfView;
 
             _captureCam.CopyFrom (_attachedCam);
+
+            _captureCam.clearFlags = CameraClearFlags.SolidColor;
+            _captureCam.backgroundColor = clearColor;
+            _captureCam.cullingMask = layermask;
             _captureCam.depth = targetCam.depth - 2;
             _captureCam.orthographic = targetCam.orthographic;
             _captureCam.orthographicSize = targetCam.orthographicSize;
             _captureCam.fieldOfView = targetCam.fieldOfView;
 
-            _captureCam.clearFlags = CameraClearFlags.SolidColor;
-            _captureCam.backgroundColor = clearColor;
-            _captureCam.cullingMask = layermask;
             _captureCam.targetTexture = _captureRtex;
         }
 	}

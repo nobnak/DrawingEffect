@@ -327,8 +327,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
-  m_Father: {fileID: 1695960674}
-  m_RootOrder: 1
+  m_Father: {fileID: 1309617762}
+  m_RootOrder: 0
 --- !u!114 &528844814
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -511,7 +511,7 @@ Camera:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingPath: -1
-  m_TargetTexture: {fileID: 0}
+  m_TargetTexture: {fileID: 8400000, guid: 3b7e7847c05bd6c4ca68909422d82481, type: 2}
   m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 0
@@ -550,7 +550,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_Children: []
+  m_Children:
+  - {fileID: 528844813}
   m_Father: {fileID: 1695960674}
   m_RootOrder: 0
 --- !u!1 &1695960673
@@ -580,7 +581,6 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 1309617762}
-  - {fileID: 528844813}
   m_Father: {fileID: 0}
   m_RootOrder: 1
 --- !u!1 &1994571022

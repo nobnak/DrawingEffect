@@ -34,16 +34,20 @@ namespace DrawingSystem {
             Release();
         }
         void Update() {
-            var width = targetCam.pixelWidth;
-            var height = targetCam.pixelHeight;
+            var width = Screen.width;
+            var height = Screen.height;
+            var targetTex = targetCam.targetTexture;
+            if (targetTex != null) {
+                width = targetTex.width;
+                height = targetTex.height;
+            }
+            Debug.LogFormat ("Size {0}x{1}", width, height);
 
-			var tiledWidth = width;
-			var tiledHeight = height;
-			if (_captureRtex == null || _captureRtex.width != tiledWidth || _captureRtex.height != tiledHeight) {
+			if (_captureRtex == null || _captureRtex.width != width || _captureRtex.height != height) {
 				Release();
-				_captureRtex = new RenderTexture(tiledWidth, tiledHeight, 24, 
+				_captureRtex = new RenderTexture(width, height, 24, 
                     RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
-				_canvasRtex = new RenderTexture(tiledWidth, tiledHeight, 24,
+				_canvasRtex = new RenderTexture(width, height, 24,
                     RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
 				_captureRtex.Create();
 				_canvasRtex.Create();
@@ -60,6 +64,7 @@ namespace DrawingSystem {
         void OnRenderImage(RenderTexture src, RenderTexture dst) {
             Graphics.Blit(_captureRtex, _canvasRtex, trackingMat);
             Graphics.Blit (_canvasRtex, dst);
+            Debug.LogFormat ("Src size {0}x{1}", src.width, src.height);
 		}
 
 		void Release() {
@@ -68,18 +73,16 @@ namespace DrawingSystem {
 		}
 
         void UpdateCameraSettings() {
-            _attachedCam.transform.localPosition = targetCam.transform.localPosition;
-            _attachedCam.transform.localRotation = targetCam.transform.localRotation;
-
+            _attachedCam.CopyFrom (targetCam);
             _attachedCam.clearFlags = CameraClearFlags.Nothing;
             _attachedCam.cullingMask = 0;
             _attachedCam.depth = targetCam.depth - 1;
             _attachedCam.orthographic = targetCam.orthographic;
             _attachedCam.orthographicSize = targetCam.orthographicSize;
             _attachedCam.fieldOfView = targetCam.fieldOfView;
+            _attachedCam.targetTexture = targetCam.targetTexture;
 
             _captureCam.CopyFrom (_attachedCam);
-
             _captureCam.clearFlags = CameraClearFlags.SolidColor;
             _captureCam.backgroundColor = clearColor;
             _captureCam.cullingMask = layermask;
@@ -87,7 +90,6 @@ namespace DrawingSystem {
             _captureCam.orthographic = targetCam.orthographic;
             _captureCam.orthographicSize = targetCam.orthographicSize;
             _captureCam.fieldOfView = targetCam.fieldOfView;
-
             _captureCam.targetTexture = _captureRtex;
         }
 	}

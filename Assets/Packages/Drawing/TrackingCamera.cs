@@ -12,23 +12,17 @@ namespace DrawingSystem {
         public TextureEvent OnUpdateTexture;
 
 		public Material trackingMat;
-        public Camera targetCam;
         public Color clearColor = Color.black;
         public LayerMask layermask;
+        public Camera[] renderCams;
 
 		RenderTexture _captureRtex;
 		RenderTexture _canvasRtex;
 
-        Camera _captureCam;
         Camera _attachedCam;
 
 		void Start() {
 			_attachedCam = GetComponent<Camera>();
-            _captureCam = new GameObject ("Capture Camera").AddComponent<Camera> ();
-
-            _captureCam.transform.SetParent (transform, false);
-            _captureCam.transform.localPosition = Vector3.zero;
-            _captureCam.transform.localRotation = Quaternion.identity;
 		}
         void OnDestroy() {
             Release();
@@ -36,14 +30,14 @@ namespace DrawingSystem {
         void Update() {
             var width = Screen.width;
             var height = Screen.height;
-            var targetTex = targetCam.targetTexture;
+            var targetTex = _attachedCam.targetTexture;
             if (targetTex != null) {
                 width = targetTex.width;
                 height = targetTex.height;
             }
-            Debug.LogFormat ("Size {0}x{1}", width, height);
-
 			if (_captureRtex == null || _captureRtex.width != width || _captureRtex.height != height) {
+                Debug.LogFormat ("Capture tex size {0}x{1}", width, height);
+
 				Release();
 				_captureRtex = new RenderTexture(width, height, 24, 
                     RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
@@ -59,6 +53,9 @@ namespace DrawingSystem {
                 OnCreateTexture.Invoke (_canvasRtex);
 			}
             UpdateCameraSettings();
+
+            Capture ();
+
             OnUpdateTexture.Invoke (_canvasRtex);
 		}
         void OnRenderImage(RenderTexture src, RenderTexture dst) {
@@ -72,25 +69,46 @@ namespace DrawingSystem {
 			Destroy(_canvasRtex);
 		}
 
+        void Capture () {
+            for (var i = 0; i < renderCams.Length; i++) {
+                var targetCam = renderCams [i];
+                if (!targetCam.isActiveAndEnabled)
+                    continue;
+                
+                var camset = new CameraSettings (targetCam);
+                targetCam.clearFlags = CameraClearFlags.SolidColor;
+                targetCam.backgroundColor = clearColor;
+                targetCam.cullingMask = layermask.value;
+                targetCam.targetTexture = _captureRtex;
+                targetCam.Render ();
+                camset.Load ();
+            }
+        }
         void UpdateCameraSettings() {
-            _attachedCam.CopyFrom (targetCam);
             _attachedCam.clearFlags = CameraClearFlags.Nothing;
             _attachedCam.cullingMask = 0;
-            _attachedCam.depth = targetCam.depth - 1;
-            _attachedCam.orthographic = targetCam.orthographic;
-            _attachedCam.orthographicSize = targetCam.orthographicSize;
-            _attachedCam.fieldOfView = targetCam.fieldOfView;
-            _attachedCam.targetTexture = targetCam.targetTexture;
+        }
 
-            _captureCam.CopyFrom (_attachedCam);
-            _captureCam.clearFlags = CameraClearFlags.SolidColor;
-            _captureCam.backgroundColor = clearColor;
-            _captureCam.cullingMask = layermask;
-            _captureCam.depth = targetCam.depth - 2;
-            _captureCam.orthographic = targetCam.orthographic;
-            _captureCam.orthographicSize = targetCam.orthographicSize;
-            _captureCam.fieldOfView = targetCam.fieldOfView;
-            _captureCam.targetTexture = _captureRtex;
+        public struct CameraSettings {
+            public Camera targetCam;
+            public CameraClearFlags clearFlags;
+            public Color backgroundColor;
+            public int cullingMask;
+            public RenderTexture targetTexture;
+
+            public CameraSettings(Camera targetCam) {
+                this.targetCam = targetCam;
+                this.clearFlags = targetCam.clearFlags;
+                this.backgroundColor = targetCam.backgroundColor;
+                this.cullingMask = targetCam.cullingMask;
+                this.targetTexture = targetCam.targetTexture;
+            }
+            public void Load() {
+                targetCam.clearFlags = clearFlags;
+                targetCam.backgroundColor = backgroundColor;
+                targetCam.cullingMask = cullingMask;
+                targetCam.targetTexture = targetTexture;     
+            }
         }
 	}
 }
